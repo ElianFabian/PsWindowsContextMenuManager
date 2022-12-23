@@ -5,7 +5,6 @@ function Add-WindowsContextMenuItem
         [Parameter(Mandatory=$true)]
         [string] $Key,
 
-        [Alias('Title', 'MUIVerb')]
         [Parameter(Mandatory=$true)]
         [ValidateLength(0, 16383)]
         [string] $Name,
@@ -21,7 +20,7 @@ function Add-WindowsContextMenuItem
 
         [Parameter(ParameterSetName='Root-Command')]
         [Parameter(ParameterSetName='Root-Group')]
-        [ValidateSet('Top', 'Bottom')]
+        [ValidateSet('Top', 'Bottom', '')]
         [string] $Position = '',
 
         [ValidateLength(0, 16383)]
@@ -44,25 +43,25 @@ function Add-WindowsContextMenuItem
         [string[]] $Tag = $null
     )
 
+    $pathType = $ContextMenuPathType.$Type
+    
+    try
+    {
+        # Create item
+        $itemPath = (New-Item -Path $pathType -Name $Key -ErrorAction Stop).PSPath.Replace("*", "``*")
+
+        Write-Verbose "New item: '$itemPath'" -Verbose:$VerbosePreference
+    }
+    catch
+    {
+        Write-Error "The item '$pathType\$Key' already exists."
+        return
+    }
+
     switch ($PSCmdlet.ParameterSetName)
     {
         'Root-Command'
         {
-            $pathType = $ContextMenuPathType.$Type
-
-            try
-            {
-                # Create item
-                $itemPath = (New-Item -Path $pathType -Name $Key -ErrorAction Stop).PSPath.Replace("*", "``*")
-
-                Write-Verbose "New item: '$itemPath'" -Verbose:$VerbosePreference
-            }
-            catch
-            {
-                Write-Error "The item '$pathType\$Key' already exists."
-                return
-            }
-
             # Create command
             $commandPath = (New-Item -Path $itemPath -Name $RegistryKeys.Command).PSPath
 
@@ -74,21 +73,7 @@ function Add-WindowsContextMenuItem
             # Set command value
             New-ItemProperty -LiteralPath $commandPath -Name  $RegistryProperties.Default -Value $Command > $null
 
-
-            if ($null -ne $Extended -and $Extended -like $true)
-            {
-                # Mark as extended (must hold Shift to make the option visible)
-                New-ItemProperty -Path $itemPath -Name $RegistryProperties.Extended > $null
-
-                Write-Verbose "New item property: '$itemPath\$($RegistryProperties.Extended)'" -Verbose:$VerbosePreference
-            }
-            if ($null -ne $Position)
-            {
-                # Set the position of the item (Top | Bottom)
-                New-ItemProperty -Path $itemPath -Name $RegistryProperties.Position -Value $Position > $null
-    
-                Write-Verbose "New item property: '$itemPath\$($RegistryProperties.Position)'" -Verbose:$VerbosePreference
-            }
+            Add-RootPropertiesIfNotNull -ItemPath $itemPath -Extended:$Extended -Position $Position
         }
         'Sub-Command'
         {
@@ -103,16 +88,24 @@ function Add-WindowsContextMenuItem
         }
         'Root-Group'
         {
-        #     [PSCustomObject]
-        #     @{
-        #         key      = $Key
-        #         name     = $Name
-        #         iconPath = $IconPath
-        #         children = $ChildItem
-        #         type     = $Type
-        #         extended = $Extended
-        #         position = $Position
-        #     } 
+            # Set group name (MUIVerb)
+            New-ItemProperty -Path $itemPath -Name $RegistryProperties.MUIVerb -Value $Name > $null
+
+            # Create shell (container of subitems)
+            $itemShellPath = (New-Item -Path $itemPath -Name $RegistryKeys.Shell).PSPath.Replace("*", "``*")
+
+            Write-Verbose "New item: '$itemShellPath'" -Verbose:$VerbosePreference
+
+            Write-Verbose "New item property: '$itemPath\$($RegistryProperties.MUIVerb)' = '$Name'" -Verbose:$VerbosePreference
+            if ($ChildItem)
+            {
+                # Allow subitems
+                New-ItemProperty -Path $itemPath -Name $RegistryProperties.Subcommands > $null
+
+                Write-Verbose "New item property: '$itemPath\$($RegistryProperties.Subcommands)'" -Verbose:$VerbosePreference
+            }
+
+            Add-RootPropertiesIfNotNull -ItemPath $itemPath -Extended:$Extended -Position $Position
         }
         'Sub-Group'
         {
