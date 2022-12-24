@@ -1,3 +1,13 @@
+$basePath = "Registry::HKEY_CLASSES_ROOT"
+
+$ContextMenuPathType =
+@{
+    File      = "$basePath\``*\shell"
+    Directory = "$basePath\Directory\shell"
+    Desktop   = "$basePath\Directory\background\shell"
+    Drive     = "$basePath\Drive\shell"
+}
+
 $RegistryKeys =
 @{
     Shell   = 'Shell'
@@ -12,15 +22,4 @@ $RegistryProperties =
     Icon        = 'Icon'
     Extended    = 'Extended'
     Position    = 'Position'
-}
-
-
-$basePath = "Registry::HKEY_CLASSES_ROOT"
-
-$ContextMenuPathType =
-@{
-    File      = "$basePath\``*\shell"
-    Directory = "$basePath\Directory\shell"
-    Desktop   = "$basePath\Directory\background\shell"
-    Drive     = "$basePath\Drive\shell"
 }
