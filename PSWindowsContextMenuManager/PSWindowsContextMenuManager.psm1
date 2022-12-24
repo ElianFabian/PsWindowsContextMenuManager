@@ -1,24 +1,28 @@
-# Code from: https://github.com/RamblingCookieMonster/PSStackExchange/blob/master/PSStackExchange/PSStackExchange.psm1
+# Code adapted from: https://github.com/RamblingCookieMonster/PSStackExchange/blob/master/PSStackExchange/PSStackExchange.psm1
 
 
 
-# Get public and private function definition files.
-$Public  = @(Get-ChildItem -Path $PSScriptRoot\Public\*.ps1  -Recurse -ErrorAction SilentlyContinue)
-$Private = @(Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -Recurse -ErrorAction SilentlyContinue)
+# Get scripts to load
+$PreloadScript = @(Get-ChildItem -Path $PSScriptRoot\*\@Preload\*.ps1 -Recurse -ErrorAction SilentlyContinue)
+$Script        = @(Get-ChildItem -Path $PSScriptRoot\*.ps1 -Recurse -ErrorAction SilentlyContinue)
 
 # Dot source the files
-foreach ($import in @($Public + $Private))
+foreach ($import in @($PreloadScript + $Script))
 {
     try
     {
-        . $import.fullname
+        . $import.FullName
     }
     catch
     {
-        Write-Error -Message "Failed to import script '$($import.fullname)': $_"
+        Write-Error -Message "Failed to import preloaded script '$($import.FullName)': $_"
     }
 }
 
 
+# Get public function definition files
+$PublicFunction = @(Get-ChildItem -Path $PSScriptRoot\Public\Functions\*.ps1  -Recurse -ErrorAction SilentlyContinue)
 
-Export-ModuleMember -Function $Public.Basename
+
+
+Export-ModuleMember -Function $PublicFunction.BaseName
