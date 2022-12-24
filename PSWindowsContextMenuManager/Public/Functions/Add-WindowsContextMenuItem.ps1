@@ -23,6 +23,7 @@ function Add-WindowsContextMenuItem
         [ValidateSet('Top', 'Bottom', '')]
         [string] $Position = '',
 
+        [ValidatePattern('(.ico)$')]
         [ValidateLength(0, 16383)]
         [string] $IconPath = '',
 
@@ -74,6 +75,15 @@ function Add-WindowsContextMenuItem
             New-ItemProperty -LiteralPath $commandPath -Name  $RegistryProperties.Default -Value $Command > $null
             Write-Verbose "New item property: $commandPath\$($RegistryProperties.Default) = '$Command'" -Verbose:$VerbosePreference
 
+            if ($IconPath)
+            {
+                Resolve-Path $IconPath -ErrorAction Stop
+
+                # Set item image
+                New-ItemProperty -Path $itemPath -Name $RegistryProperties.Icon -Value $iconPath > $null
+                Write-Verbose "New item property: $itemPath\$($RegistryProperties.Icon) = '$iconPath'" -Verbose:$Verbose
+            }
+
             Add-RootPropertiesIfNotNull -ItemPath $itemPath -Extended:$Extended -Position $Position
         }
         'Sub-Command'
@@ -82,7 +92,6 @@ function Add-WindowsContextMenuItem
             # @{
             #     key      = $Key
             #     name     = $Name
-            #     type     = $Type
             #     iconPath = $IconPath
             #     command  = $Command
             # }  
@@ -100,6 +109,15 @@ function Add-WindowsContextMenuItem
             # Allow subitems
             New-ItemProperty -Path $itemPath -Name $RegistryProperties.Subcommands > $null
             Write-Verbose "New item property: $itemPath\$($RegistryProperties.Subcommands)" -Verbose:$VerbosePreference
+
+            # Add subitems
+            foreach ($subitem in $ChildItem)
+            {
+                Add-WindowsContextMenuItem `
+                    -Key $subitem.key `
+                    -Name $subitem.name `
+                    -IconPath $subitem.iconPath
+            }
 
             Add-RootPropertiesIfNotNull -ItemPath $itemPath -Extended:$Extended -Position $Position
         }
