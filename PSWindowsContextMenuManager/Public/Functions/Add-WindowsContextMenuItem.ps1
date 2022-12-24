@@ -50,7 +50,7 @@ function Add-WindowsContextMenuItem
         # Create item
         $itemPath = (New-Item -Path $pathType -Name $Key -ErrorAction Stop).PSPath.Replace("*", "``*")
 
-        Write-Verbose "New item: '$itemPath'" -Verbose:$VerbosePreference
+        Write-Verbose "New item: $itemPath" -Verbose:$VerbosePreference
     }
     catch
     {
@@ -64,14 +64,15 @@ function Add-WindowsContextMenuItem
         {
             # Create command
             $commandPath = (New-Item -Path $itemPath -Name $RegistryKeys.Command).PSPath
-
-            Write-Verbose "New command item: '$commandPath'" -Verbose:$VerbosePreference
+            Write-Verbose "New command item: $commandPath" -Verbose:$VerbosePreference
 
             # Set command name
             New-ItemProperty -Path $itemPath -Name $RegistryProperties.Default -Value $Name > $null
+            Write-Verbose "New item property: $itemPath\$($RegistryProperties.Default) = '$Name'" -Verbose:$VerbosePreference
 
             # Set command value
             New-ItemProperty -LiteralPath $commandPath -Name  $RegistryProperties.Default -Value $Command > $null
+            Write-Verbose "New item property: $commandPath\$($RegistryProperties.Default) = '$Command'" -Verbose:$VerbosePreference
 
             Add-RootPropertiesIfNotNull -ItemPath $itemPath -Extended:$Extended -Position $Position
         }
@@ -90,21 +91,15 @@ function Add-WindowsContextMenuItem
         {
             # Set group name (MUIVerb)
             New-ItemProperty -Path $itemPath -Name $RegistryProperties.MUIVerb -Value $Name > $null
+            Write-Verbose "New item property: $itemPath\$($RegistryProperties.MUIVerb) = '$Name'" -Verbose:$VerbosePreference
 
             # Create shell (container of subitems)
             $itemShellPath = (New-Item -Path $itemPath -Name $RegistryKeys.Shell).PSPath.Replace("*", "``*")
+            Write-Verbose "New item: $itemShellPath" -Verbose:$VerbosePreference
 
-            Write-Verbose "New item: '$itemShellPath'" -Verbose:$VerbosePreference
-
-            Write-Verbose "New item property: '$itemPath\$($RegistryProperties.MUIVerb)' = '$Name'" -Verbose:$VerbosePreference
-
-            if ($ChildItem)
-            {
-                # Allow subitems
-                New-ItemProperty -Path $itemPath -Name $RegistryProperties.Subcommands > $null
-
-                Write-Verbose "New item property: '$itemPath\$($RegistryProperties.Subcommands)'" -Verbose:$VerbosePreference
-            }
+            # Allow subitems
+            New-ItemProperty -Path $itemPath -Name $RegistryProperties.Subcommands > $null
+            Write-Verbose "New item property: $itemPath\$($RegistryProperties.Subcommands)" -Verbose:$VerbosePreference
 
             Add-RootPropertiesIfNotNull -ItemPath $itemPath -Extended:$Extended -Position $Position
         }
