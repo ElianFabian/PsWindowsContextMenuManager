@@ -97,6 +97,7 @@ function Add-WindowsContextMenuItem
             Write-Verbose "New item: '$itemShellPath'" -Verbose:$VerbosePreference
 
             Write-Verbose "New item property: '$itemPath\$($RegistryProperties.MUIVerb)' = '$Name'" -Verbose:$VerbosePreference
+
             if ($ChildItem)
             {
                 # Allow subitems
