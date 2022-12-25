@@ -21,7 +21,6 @@ function New-WcmItem
         [string] $Position = '',
 
         [ValidateScript({ $_ -match '^.+\.ico$' }, ErrorMessage = "The given IconPath '{0}' must be a .ico file.")]
-        [ValidateScript({ Test-Path $_ }, ErrorMessage = "The given IconPath '{0}' does not exists.")]
         [string] $IconPath = '',
 
         [Parameter(ParameterSetName='Sub-Command', Mandatory=$true)]
@@ -42,39 +41,21 @@ function New-WcmItem
     $typePath     = $ContextMenuPathType.$Type
     $locationPath = $PSCmdlet.ParameterSetName.StartsWith('Root') ? $typePath : "$typePath\$ParentPath\$($RegistryKeys.Shell)"
 
-
-    try
+    if (-not (Test-Path $locationPath))
     {
-        # Create item
-        $itemPath = (New-Item -Path $locationPath -Name $Key -ErrorAction Stop).PSPath.Replace("*", "``*")
+        Write-Error "The path '$locationPath' does not exist."
+        return
     }
-    catch { Write-Error -Message "Failed to import script '$($import.FullName)': $_" }
 
+    # Create item
+    $itemPath = (New-Item -Path $locationPath -Name $Key -ErrorAction Stop).PSPath.Replace("*", "``*")
 
     switch ($PSCmdlet.ParameterSetName)
     {
         Root-Command
         {
-            # Create command
-            $commandPath = (New-Item -Path $itemPath -Name $RegistryKeys.Command).PSPath
-            Write-Verbose "New command item: $commandPath" -Verbose:$VerbosePreference
+            New-WcmRegistryItem -ItemPath $itemPath -Name $Name -IconPath $IconPath -Command $Command
 
-            # Set command name
-            New-ItemProperty -Path $itemPath -Name $RegistryProperties.Default -Value $Name > $null
-            Write-Verbose "New item property: $itemPath\$($RegistryProperties.Default) = ""$Name""" -Verbose:$VerbosePreference
-
-            # Set command value
-            New-ItemProperty -LiteralPath $commandPath -Name  $RegistryProperties.Default -Value $Command > $null
-            Write-Verbose "New item property: $commandPath\$($RegistryProperties.Default) = ""$Command""" -Verbose:$VerbosePreference
-
-            if ($IconPath)
-            {
-                # Set item image
-                New-ItemProperty -Path $itemPath -Name $RegistryProperties.Icon -Value $iconPath > $null
-                Write-Verbose "New item property: $itemPath\$($RegistryProperties.Icon) = $iconPath" -Verbose:$VerbosePreference
-            }
-
-            # Set root properties
             Add-RootPropertiesIfPossible -ItemPath $itemPath -Extended:$Extended -Position $Position
         }
         Root-Group
@@ -99,54 +80,29 @@ function New-WcmItem
             {
                 if ($subCommand = [IWcmSubCommandItem] $subitem)
                 {
-                    Add-WcmItem `
+                    New-WcmItem `
                         -Key $subCommand.Key `
                         -Name $subCommand.Name `
+                        -Type $Type `
                         -IconPath $subCommand.IconPath `
                         -Command $subCommand.Command `
-                        -ParentPath $itemShellPath
+                        -ParentPath $itemShellPath `
                 }
                 elseif ($subGroup = [IWcmSubGroupItem] $subitem)
                 {
-                    Add-WcmItem `
+                    New-WcmItem `
                         -Key $subGroup.Key `
                         -Name $subGroup.Name `
+                        -Type $Type `
                         -IconPath $subGroup.IconPath `
                         -ChildItem $subGroup.Children `
-                        -ParentPath $itemShellPath
+                        -ParentPath $itemShellPath `
                 }
             }
         }
         Sub-Command
         {
-            # [PSCustomObject]
-            # @{
-            #     key      = $Key
-            #     name     = $Name
-            #     iconPath = $IconPath
-            #     command  = $Command
-            # } 
-
-            # Create command
-            $commandPath = (New-Item -Path $itemPath -Name $RegistryKeys.Command).PSPath
-            Write-Verbose "New command item: $commandPath" -Verbose:$VerbosePreference
-
-            # Set command name
-            New-ItemProperty -Path $itemPath -Name $RegistryProperties.Default -Value $Name > $null
-            Write-Verbose "New item property: $itemPath\$($RegistryProperties.Default) = ""$Name""" -Verbose:$VerbosePreference
-
-            # Set command value
-            New-ItemProperty -LiteralPath $commandPath -Name  $RegistryProperties.Default -Value $Command > $null
-            Write-Verbose "New item property: $commandPath\$($RegistryProperties.Default) = ""$Command""" -Verbose:$VerbosePreference
-
-            if ($IconPath)
-            {
-                # Set item image
-                New-ItemProperty -Path $itemPath -Name $RegistryProperties.Icon -Value $IconPath > $null
-                Write-Verbose "New item property: $itemPath\$($RegistryProperties.Icon) = ""$IconPath""" -Verbose:$VerbosePreference
-            }
-
-            Add-RootPropertiesIfPossible -ItemPath $itemPath -Extended:$Extended -Position $Position
+            New-WcmRegistryItem -ItemPath $itemPath -Name $Name -IconPath $IconPath -Command $Command
         }
         Sub-Group
         {
