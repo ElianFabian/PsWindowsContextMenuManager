@@ -1,4 +1,4 @@
-function Add-RootPropertiesIfNotNull(
+function Add-RootPropertiesIfPossible(
     [string] $ItemPath,
     [switch] $Extended,
     [ValidateSet('Top', 'Bottom', '')]

@@ -75,7 +75,7 @@ function New-WcmItem
             }
 
             # Set root properties
-            Add-RootPropertiesIfNotNull -ItemPath $itemPath -Extended:$Extended -Position $Position
+            Add-RootPropertiesIfPossible -ItemPath $itemPath -Extended:$Extended -Position $Position
         }
         Root-Group
         {
@@ -84,7 +84,7 @@ function New-WcmItem
             Write-Verbose "New item property: $itemPath\$($RegistryProperties.MUIVerb) = ""$Name""" -Verbose:$VerbosePreference
 
             # Set root properties
-            Add-RootPropertiesIfNotNull -ItemPath $itemPath -Extended:$Extended -Position $Position
+            Add-RootPropertiesIfPossible -ItemPath $itemPath -Extended:$Extended -Position $Position
 
             # Allow subitems
             New-ItemProperty -Path $itemPath -Name $RegistryProperties.Subcommands > $null
@@ -146,7 +146,7 @@ function New-WcmItem
                 Write-Verbose "New item property: $itemPath\$($RegistryProperties.Icon) = ""$IconPath""" -Verbose:$VerbosePreference
             }
 
-            Add-RootPropertiesIfNotNull -ItemPath $itemPath -Extended:$Extended -Position $Position
+            Add-RootPropertiesIfPossible -ItemPath $itemPath -Extended:$Extended -Position $Position
         }
         Sub-Group
         {
