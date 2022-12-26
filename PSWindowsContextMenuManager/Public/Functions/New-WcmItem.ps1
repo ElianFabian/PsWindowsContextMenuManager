@@ -8,111 +8,92 @@ function New-WcmItem
         [Parameter(Mandatory=$true)]
         [string] $Name,
 
+        [Parameter(Mandatory=$true)]
         [ValidateSet('File', 'Directory', 'Desktop', 'Drive')]
         [string] $Type,
 
-        [Parameter(ParameterSetName='Root-Command')]
-        [Parameter(ParameterSetName='Root-Group')]
         [switch] $Extended = $false,
 
-        [Parameter(ParameterSetName='Root-Command')]
-        [Parameter(ParameterSetName='Root-Group')]
         [ValidateSet('Top', 'Bottom', '')]
         [string] $Position = '',
 
-        [ValidateScript({ $_ -match '^.+\.ico$' }, ErrorMessage = "The given IconPath '{0}' must be a .ico file.")]
+        [ValidatePattern('(.ico|^$)$', ErrorMessage = "The given IconPath '{0}' must be a .ico file.")]
         [string] $IconPath = '',
 
-        [Parameter(ParameterSetName='Sub-Command', Mandatory=$true)]
-        [Parameter(ParameterSetName='Sub-Group',   Mandatory=$true)]
         [string] $ParentPath = '',
 
-        [Parameter(ParameterSetName='Root-Command')]
-        [Parameter(ParameterSetName='Sub-Command')]
+        [Parameter(ParameterSetName='Command')]
         [string] $Command,
 
-        [Parameter(ParameterSetName='Root-Group')]
-        [Parameter(ParameterSetName='Sub-Group')]
-        [IWcmItem[]] $ChildItem,
-
-        [string[]] $Tag = $null
+        [Parameter(ParameterSetName='Group')]
+        [object[]] $ChildItem
     )
 
-    $typePath     = $ContextMenuPathType.$Type
-    $locationPath = $PSCmdlet.ParameterSetName.StartsWith('Root') ? $typePath : "$typePath\$ParentPath\$($RegistryKeys.Shell)"
+    $typePath           = $ContextMenuPathType.$Type
+    $parentAbsolutePath = $ParentPath ? "$typePath\$ParentPath" : "$typePath"
 
-    if (-not (Test-Path $locationPath))
+
+    if (-not (Test-Path -LiteralPath $parentAbsolutePath))
     {
-        Write-Error "The path '$locationPath' does not exist."
+        Write-Error "The path '$parentAbsolutePath' does not exist."
         return
     }
 
+    $itemPath = "$parentAbsolutePath\$Key"
+
     # Create item
-    $itemPath = (New-Item -Path $locationPath -Name $Key -ErrorAction Stop).PSPath.Replace("*", "``*")
+    New-Item $itemPath -ErrorAction SilentlyContinue -ErrorVariable outErrorMessage > $null
+    Write-Verbose "New item: $itemPath" -Verbose:$VerbosePreference
+
+    switch ($outErrorMessage)
+    {
+        'A key in this path already exists.'
+        {
+            Write-Error "The path 'itemPath' already exists."
+            return
+        }
+    }
 
     switch ($PSCmdlet.ParameterSetName)
     {
-        Root-Command
+        Command
         {
-            New-WcmRegistryItem -ItemPath $itemPath -Name $Name -IconPath $IconPath -Command $Command
+            New-WcmRegistryCommandItem -ItemPath $itemPath -Name $Name -IconPath $IconPath -Command $Command
 
             Add-RootPropertiesIfPossible -ItemPath $itemPath -Extended:$Extended -Position $Position
         }
-        Root-Group
+        Group
         {
-            # Set group name (MUIVerb)
-            New-ItemProperty -Path $itemPath -Name $RegistryProperties.MUIVerb -Value $Name > $null
-            Write-Verbose "New item property: $itemPath\$($RegistryProperties.MUIVerb) = ""$Name""" -Verbose:$VerbosePreference
+            New-WcmRegistryGroupItem -ItemPath $itemPath -Name $Name -IconPath $IconPath
 
-            # Set root properties
             Add-RootPropertiesIfPossible -ItemPath $itemPath -Extended:$Extended -Position $Position
-
-            # Allow subitems
-            New-ItemProperty -Path $itemPath -Name $RegistryProperties.Subcommands > $null
-            Write-Verbose "New item property: $itemPath\$($RegistryProperties.Subcommands)" -Verbose:$VerbosePreference
-
-            # Create shell (container of subitems)
-            $itemShellPath = (New-Item -Path $itemPath -Name $RegistryKeys.Shell).PSPath.Replace("*", "``*")
-            Write-Verbose "New item: $itemShellPath" -Verbose:$VerbosePreference
 
             # Add subitems
             foreach ($subitem in $ChildItem)
             {
-                if ($subCommand = [IWcmSubCommandItem] $subitem)
+                $parentShellPath = "$($ParentPath ? "$ParentPath\$Key" : $Key)\$($RegistryKeys.Shell)"
+
+                if ($subitem.Command)
                 {
                     New-WcmItem `
-                        -Key $subCommand.Key `
-                        -Name $subCommand.Name `
+                        -Key $subitem.Key `
+                        -Name $subitem.Name `
                         -Type $Type `
-                        -IconPath $subCommand.IconPath `
-                        -Command $subCommand.Command `
-                        -ParentPath $itemShellPath `
+                        -IconPath $subitem.IconPath `
+                        -Command $subitem.Command `
+                        -ParentPath $parentShellPath `
                 }
-                elseif ($subGroup = [IWcmSubGroupItem] $subitem)
+                else
                 {
                     New-WcmItem `
-                        -Key $subGroup.Key `
-                        -Name $subGroup.Name `
+                        -Key $subitem.Key `
+                        -Name $subitem.Name `
                         -Type $Type `
-                        -IconPath $subGroup.IconPath `
-                        -ChildItem $subGroup.Children `
-                        -ParentPath $itemShellPath `
+                        -IconPath $subitem.IconPath `
+                        -ChildItem $subitem.Children `
+                        -ParentPath $parentShellPath `
                 }
             }
-        }
-        Sub-Command
-        {
-            New-WcmRegistryItem -ItemPath $itemPath -Name $Name -IconPath $IconPath -Command $Command
-        }
-        Sub-Group
-        {
-            # [PSCustomObject]
-            # @{
-            #     key      = $Key
-            #     name     = $Name
-            #     iconPath = $IconPath
-            #     children = $ChildItem
-            # } 
         }
     }
 }

@@ -1,4 +1,4 @@
-function New-WcmRegistryItem
+function New-WcmRegistryCommandItem
 {
     param
     (
@@ -8,12 +8,14 @@ function New-WcmRegistryItem
         [string] $Command
     )
 
+    $commandPath = "$ItemPath\$($RegistryKeys.Command)"
+
     # Create command
-    $commandPath = (New-Item -Path $ItemPath -Name $RegistryKeys.Command).PSPath
+    New-Item $commandPath > $null
     Write-Verbose "New command item: $commandPath" -Verbose:$VerbosePreference
 
     # Set command name
-    New-ItemProperty -Path $ItemPath -Name $RegistryProperties.Default -Value $Name > $null
+    New-ItemProperty -LiteralPath $ItemPath -Name $RegistryProperties.Default -Value $Name > $null
     Write-Verbose "New item property: $ItemPath\$($RegistryProperties.Default) = ""$Name""" -Verbose:$VerbosePreference
 
     # Set command value
@@ -26,12 +28,12 @@ function New-WcmRegistryItem
 
         if (-not (Test-Path $actualIconPath))
         {
-            Write-Warning "The icon '$actualIconPath' does not exist."
+            Write-Warning "The icon '$actualIconPath' added to '$ItemPath' does not exist."
         }
         else { $actualIconPath = Resolve-Path $IconPath }
 
         # Set item image
-        New-ItemProperty -Path $ItemPath -Name $RegistryProperties.Icon -Value $actualIconPath > $null
+        New-ItemProperty -LiteralPath $ItemPath -Name $RegistryProperties.Icon -Value $actualIconPath > $null
         Write-Verbose "New item property: $ItemPath\$($RegistryProperties.Icon) = $actualIconPath" -Verbose:$VerbosePreference
     }
 }

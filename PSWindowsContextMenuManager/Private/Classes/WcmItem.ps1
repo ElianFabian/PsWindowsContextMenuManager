@@ -1,34 +1,24 @@
-class WcmItem : IWcmItem
+class WcmItem
 {
     [string] $Key
     [string] $Name
-    [ValidatePattern('(.ico|)$')]
+    [ValidatePattern('(\.ico|^$)$')]
     [string] $IconPath
-}
-
-class WcmRootItem : WcmItem, IWcmRootItem
-{
-    [ValidateSet('File', 'Directory', 'Desktop', 'Drive')]
+    [ValidateSet('File', 'Directory', 'Desktop', 'Drive', '')]
     [string] $Type
-    [bool]   $Extended = $false
+
+
+    [bool] $Extended = $false
     [ValidateSet('Top', 'Bottom', '')]
     [string] $Position = ''
 }
 
-class WcmRootCommandItem : WcmRootItem, IWcmRootCommandItem
-{
-    [string] $Command
-}
-class WcmSubCommandItem : WcmItem, IWcmSubCommandItem
+class WcmCommandItem : WcmItem
 {
     [string] $Command
 }
 
-class WcmRootGroupItem : WcmRootItem, IWcmGroupItem
+class WcmGroupItem : WcmItem
 {
-    [IWcmItem[]] $Children
-}
-class WcmSubGroupItem : WcmItem, IWcmGroupItem
-{
-    [IWcmItem[]] $Children
+    [WcmItem[]] $Children
 }

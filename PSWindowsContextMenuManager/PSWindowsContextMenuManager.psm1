@@ -3,11 +3,10 @@
 
 
 # Get scripts to load
-$PreloadScript = @(Get-ChildItem -Path $PSScriptRoot\*\@Preload\*.ps1 -Recurse -ErrorAction SilentlyContinue)
-$Script        = @(Get-ChildItem -Path $PSScriptRoot\*.ps1 -Recurse -ErrorAction SilentlyContinue)
+$Script = @(Get-ChildItem -Path $PSScriptRoot\*.ps1 -Recurse -ErrorAction SilentlyContinue)
 
 # Dot source the files
-foreach ($import in @($PreloadScript + $Script))
+foreach ($import in @($Script))
 {
     try
     {
@@ -15,7 +14,7 @@ foreach ($import in @($PreloadScript + $Script))
     }
     catch
     {
-        Write-Error -Message "Failed to import preloaded script '$($import.FullName)': $_"
+        Write-Error "Failed to import preloaded script '$($import.FullName)': $_"
     }
 }
 
