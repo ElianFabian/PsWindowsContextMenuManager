@@ -16,6 +16,6 @@ function Add-RootPropertiesIfPossible(
         # Set the position (Top | Bottom)
         New-ItemProperty -LiteralPath $ItemPath -Name $RegistryProperties.Position -Value $Position > $null
 
-        Write-Verbose "New item property: $ItemPath\$($RegistryProperties.Position) = '$Position'" -Verbose:$VerbosePreference
+        Write-Verbose "New item property: $ItemPath\$($RegistryProperties.Position) = ""$Position""" -Verbose:$VerbosePreference
     }
 }
