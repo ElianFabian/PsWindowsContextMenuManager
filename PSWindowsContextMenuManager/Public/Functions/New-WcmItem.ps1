@@ -12,20 +12,28 @@ function New-WcmItem
         [ValidateSet('File', 'Directory', 'Desktop', 'Drive')]
         [string] $Type,
 
+        [Parameter(ParameterSetName='Root-Command')]
+        [Parameter(ParameterSetName='Root-Group')]
         [switch] $Extended = $false,
 
+        [Parameter(ParameterSetName='Root-Command')]
+        [Parameter(ParameterSetName='Root-Group')]
         [ValidateSet('Top', 'Bottom', '')]
         [string] $Position = '',
 
         [ValidatePattern('(.ico|^$)$', ErrorMessage = "The given IconPath '{0}' must be a .ico file.")]
         [string] $IconPath = '',
 
+        [Parameter(ParameterSetName='Sub-Command')]
+        [Parameter(ParameterSetName='Sub-Group')]
         [string] $ParentPath = '',
 
-        [Parameter(ParameterSetName='Command')]
+        [Parameter(ParameterSetName='Root-Command')]
+        [Parameter(ParameterSetName='Sub-Command')]
         [string] $Command,
 
-        [Parameter(ParameterSetName='Group')]
+        [Parameter(ParameterSetName='Root-Group')]
+        [Parameter(ParameterSetName='Sub-Group')]
         [object[]] $ChildItem
     )
 
@@ -54,15 +62,15 @@ function New-WcmItem
         }
     }
 
-    switch ($PSCmdlet.ParameterSetName)
+    switch -Wildcard ($PSCmdlet.ParameterSetName)
     {
-        Command
+        *-Command
         {
             New-WcmRegistryCommandItem -ItemPath $itemPath -Name $Name -IconPath $IconPath -Command $Command
 
             Add-RootPropertiesIfPossible -ItemPath $itemPath -Extended:$Extended -Position $Position
         }
-        Group
+        *-Group
         {
             New-WcmRegistryGroupItem -ItemPath $itemPath -Name $Name -IconPath $IconPath
 
