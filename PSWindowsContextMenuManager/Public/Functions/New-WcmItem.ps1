@@ -38,7 +38,7 @@ function New-WcmItem
     )
 
     $typePath           = $ContextMenuPathType.$Type
-    $parentAbsolutePath = $ParentPath ? "$typePath\$ParentPath" : "$typePath"
+    $parentAbsolutePath = "$typePath\$ParentPath"
 
 
     if (-not (Test-Path -LiteralPath $parentAbsolutePath))
