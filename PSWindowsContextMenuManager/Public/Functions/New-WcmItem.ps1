@@ -37,7 +37,8 @@ function New-WcmItem
         [object[]] $ChildItem
     )
 
-    $typePath = $ContextMenuPathType.$Type
+    $ParentKeyPath = $ParentKeyPath.Trim('\').Trim('/')
+    $typePath      = $ContextMenuPathType.$Type
 
     $actualParentPath = if ($ParentKeyPath)
     {
