@@ -7,6 +7,9 @@ function New-WcmItem
 
         [Parameter(Mandatory=$true)]
         [string] $Name,
+        
+        [ValidatePattern('(.ico|^$)$', ErrorMessage = "The given IconPath '{0}' must be a .ico file.")]
+        [string] $IconPath = '',
 
         [Parameter(Mandatory=$true)]
         [ValidateSet('File', 'Directory', 'Desktop', 'Drive')]
@@ -20,9 +23,6 @@ function New-WcmItem
         [Parameter(ParameterSetName='Root-Group')]
         [ValidateSet('Top', 'Bottom', '')]
         [string] $Position = '',
-
-        [ValidatePattern('(.ico|^$)$', ErrorMessage = "The given IconPath '{0}' must be a .ico file.")]
-        [string] $IconPath = '',
 
         [Parameter(ParameterSetName='Sub-Command')]
         [Parameter(ParameterSetName='Sub-Group')]
@@ -38,7 +38,7 @@ function New-WcmItem
     )
 
     $typePath           = $ContextMenuPathType.$Type
-    $parentAbsolutePath = "$typePath\$ParentPath"
+    $parentAbsolutePath = $ParentPath ? "$typePath\$ParentPath" : $typePath
 
 
     if (-not (Test-Path -LiteralPath $parentAbsolutePath))
@@ -57,7 +57,7 @@ function New-WcmItem
     {
         'A key in this path already exists.'
         {
-            Write-Error "The path 'itemPath' already exists."
+            Write-Error "The path '$itemPath' already exists."
             return
         }
     }
@@ -69,6 +69,15 @@ function New-WcmItem
             New-WcmRegistryCommandItem -ItemPath $itemPath -Name $Name -IconPath $IconPath -Command $Command
 
             Add-RootPropertiesIfPossible -ItemPath $itemPath -Extended:$Extended -Position $Position
+
+            return New-WcmItemObject `
+                    -Key $Key `
+                    -Name $Name `
+                    -IconPath $IconPath `
+                    -Type $Type `
+                    -Extended:$Extended `
+                    -Position $Position `
+                    -Command $Command
         }
         *-Group
         {
@@ -77,31 +86,40 @@ function New-WcmItem
             Add-RootPropertiesIfPossible -ItemPath $itemPath -Extended:$Extended -Position $Position
 
             # Add subitems
+            $parentShellPath = "$($ParentPath ? "$ParentPath\$Key" : $Key)\$($RegistryKeys.Shell)"
+
             foreach ($subitem in $ChildItem)
             {
-                $parentShellPath = "$($ParentPath ? "$ParentPath\$Key" : $Key)\$($RegistryKeys.Shell)"
-
                 if ($subitem.Command)
                 {
                     New-WcmItem `
                         -Key $subitem.Key `
                         -Name $subitem.Name `
-                        -Type $Type `
                         -IconPath $subitem.IconPath `
+                        -Type $Type `
                         -Command $subitem.Command `
-                        -ParentPath $parentShellPath `
+                        -ParentPath $parentShellPath > $null
                 }
                 else
                 {
                     New-WcmItem `
                         -Key $subitem.Key `
                         -Name $subitem.Name `
-                        -Type $Type `
                         -IconPath $subitem.IconPath `
+                        -Type $Type `
                         -ChildItem $subitem.Children `
-                        -ParentPath $parentShellPath `
+                        -ParentPath $parentShellPath > $null
                 }
             }
+
+            return New-WcmItemObject `
+                    -Key $Key `
+                    -Name $Name `
+                    -IconPath $IconPath `
+                    -Type $Type `
+                    -Extended:$Extended `
+                    -Position $Position `
+                    -ChildItem $ChildItem
         }
     }
 }
