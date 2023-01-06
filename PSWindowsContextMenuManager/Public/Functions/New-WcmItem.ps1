@@ -94,6 +94,20 @@ function New-WcmItem
 
             Add-RootPropertiesIfPossible -ItemPath $itemPath -Extended:$Extended -Position $Position
 
+
+            $childrenKeys       = $ChildItem | ForEach-Object { $_.Key }
+            $uniqueChildrenKeys = $childrenKeys | Select-Object -Unique
+
+            $diff = Compare-Object -ReferenceObject $childrenKeys -DifferenceObject $uniqueChildrenKeys
+
+            if ($diff)
+            {
+                $duplicateKeys = $($diff | ForEach-Object { $_.InputObject } | Select-Object -Unique | Join-String -Separator ', ')
+
+                Write-Error "The are duplicate keys in '$itemPath\$($RegistryKeys.Shell)': [$duplicateKeys]"
+                return
+            }
+
             # Add subitems
             $subitemParentKeyPath = $ParentKeyPath ? "$ParentKeyPath\$Key" : $Key
 
