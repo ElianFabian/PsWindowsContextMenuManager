@@ -37,9 +37,17 @@ function New-WcmItem
         [object[]] $ChildItem
     )
 
-    $typePath           = $ContextMenuPathType.$Type
-    $parentAbsolutePath = $ParentKeyPath ? "$typePath\$ParentKeyPath" : $typePath
+    $typePath = $ContextMenuPathType.$Type
 
+    $actualParentPath = if ($ParentKeyPath)
+    {
+        $path = ($ParentKeyPath -replace '/', '\\' -split '\\'| ForEach-Object { "$_\$($RegistryKeys.Shell)\" } | Join-String)
+
+        $path.Remove($path.Length - 1)
+    }
+    else { $ParentKeyPath }
+
+    $parentAbsolutePath = $actualParentPath ? "$typePath\$actualParentPath" : $typePath
 
     if (-not (Test-Path -LiteralPath $parentAbsolutePath))
     {
@@ -86,7 +94,7 @@ function New-WcmItem
             Add-RootPropertiesIfPossible -ItemPath $itemPath -Extended:$Extended -Position $Position
 
             # Add subitems
-            $parentShellPath = "$($ParentKeyPath ? "$ParentKeyPath\$Key" : $Key)\$($RegistryKeys.Shell)"
+            $subitemParentKeyPath = $ParentKeyPath ? "$ParentKeyPath\$Key" : $Key
 
             foreach ($subitem in $ChildItem)
             {
@@ -98,7 +106,7 @@ function New-WcmItem
                         -IconPath $subitem.IconPath `
                         -Type $Type `
                         -Command $subitem.Command `
-                        -ParentKeyPath $parentShellPath > $null
+                        -ParentKeyPath $subitemParentKeyPath > $null
                 }
                 else
                 {
@@ -108,7 +116,7 @@ function New-WcmItem
                         -IconPath $subitem.IconPath `
                         -Type $Type `
                         -ChildItem $subitem.Children `
-                        -ParentKeyPath $parentShellPath > $null
+                        -ParentKeyPath $subitemParentKeyPath > $null
                 }
             }
 
