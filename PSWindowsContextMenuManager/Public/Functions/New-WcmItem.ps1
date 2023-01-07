@@ -88,7 +88,6 @@ function New-WcmItem
 
             Add-RootPropertiesIfPossible -ItemPath $itemPath -Extended:$Extended -Position $Position
 
-
             $childrenKeys       = $ChildItem | ForEach-Object { $_.Key }
             $uniqueChildrenKeys = $childrenKeys | Select-Object -Unique
 
