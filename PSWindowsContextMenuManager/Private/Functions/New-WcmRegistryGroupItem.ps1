@@ -17,5 +17,5 @@ function New-WcmRegistryGroupItem
 
     # Create shell (container of subitems)
     New-Item -Path "$ItemPath\$($RegistryKeys.Shell)" > $null
-    Write-Verbose "New shell item: $ItemPath\$($RegistryKeys.Shell)" -Verbose:$VerbosePreference
+    Write-Verbose "New item: $ItemPath\$($RegistryKeys.Shell)" -Verbose:$VerbosePreference
 }

@@ -12,7 +12,7 @@ function New-WcmRegistryCommandItem
 
     # Create command
     New-Item $commandPath > $null
-    Write-Verbose "New command item: $commandPath" -Verbose:$VerbosePreference
+    Write-Verbose "New item: $commandPath" -Verbose:$VerbosePreference
 
     # Set command name
     New-ItemProperty -LiteralPath $ItemPath -Name $RegistryProperties.Default -Value $Name > $null
