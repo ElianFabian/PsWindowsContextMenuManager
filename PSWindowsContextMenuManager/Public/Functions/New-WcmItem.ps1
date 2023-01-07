@@ -74,13 +74,13 @@ function New-WcmItem
             Add-RootPropertiesIfPossible -ItemPath $itemPath -Extended:$Extended -Position $Position
 
             return New-WcmItemObject `
-                    -Key $Key `
-                    -Name $Name `
-                    -IconPath $IconPath `
-                    -Type $Type `
-                    -Extended:$Extended `
-                    -Position $Position `
-                    -Command $Command
+                -Key $Key `
+                -Name $Name `
+                -IconPath $IconPath `
+                -Type $Type `
+                -Extended:$Extended `
+                -Position $Position `
+                -Command $Command
         }
         *-Group
         {
@@ -129,13 +129,13 @@ function New-WcmItem
             }
 
             return New-WcmItemObject `
-                    -Key $Key `
-                    -Name $Name `
-                    -IconPath $IconPath `
-                    -Type $Type `
-                    -Extended:$Extended `
-                    -Position $Position `
-                    -ChildItem $ChildItem
+                -Key $Key `
+                -Name $Name `
+                -IconPath $IconPath `
+                -Type $Type `
+                -Extended:$Extended `
+                -Position $Position `
+                -ChildItem $ChildItem
         }
     }
 }
