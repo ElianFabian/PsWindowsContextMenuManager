@@ -40,13 +40,7 @@ function New-WcmItem
     $ParentKeyPath = $ParentKeyPath.Trim('\').Trim('/')
     $typePath      = $ContextMenuPathType.$Type
 
-    $actualParentPath = if ($ParentKeyPath)
-    {
-        $path = ($ParentKeyPath -replace '/', '\\' -split '\\'| ForEach-Object { "$_\$($RegistryKeys.Shell)\" } | Join-String)
-
-        $path.Remove($path.Length - 1)
-    }
-    else { $ParentKeyPath }
+    $actualParentPath = Resolve-KeyPath $ParentKeyPath
 
     $parentAbsolutePath = $actualParentPath ? "$typePath\$actualParentPath" : $typePath
 
