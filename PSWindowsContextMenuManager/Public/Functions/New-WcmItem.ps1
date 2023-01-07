@@ -37,20 +37,15 @@ function New-WcmItem
         [object[]] $ChildItem
     )
 
-    $ParentKeyPath = $ParentKeyPath.Trim('\').Trim('/')
-    $typePath      = $ContextMenuPathType.$Type
+    $actualParentPath = Resolve-KeyPath -KeyPath $ParentKeyPath -Type $Type -ChildName $RegistryKeys.Shell
 
-    $actualParentPath = Resolve-KeyPath $ParentKeyPath -ChildName $RegistryKeys.Shell
-
-    $parentAbsolutePath = $actualParentPath ? "$typePath\$actualParentPath" : $typePath
-
-    if (-not (Test-Path -LiteralPath $parentAbsolutePath))
+    if (-not (Test-Path -LiteralPath $actualParentPath))
     {
-        Write-Error "The path '$parentAbsolutePath' does not exist."
+        Write-Error "The path '$actualParentPath' does not exist."
         return
     }
 
-    $itemPath = "$parentAbsolutePath\$Key"
+    $itemPath = "$actualParentPath\$Key"
 
     # Create item
     New-Item $itemPath -ErrorAction SilentlyContinue -ErrorVariable outErrorMessage > $null
