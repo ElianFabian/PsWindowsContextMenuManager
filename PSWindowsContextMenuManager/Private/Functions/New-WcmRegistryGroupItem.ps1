@@ -2,8 +2,12 @@ function New-WcmRegistryGroupItem
 {
     param
     (
+        [Parameter(Mandatory=$true)]
         [string] $ItemPath,
+
+        [Parameter(Mandatory=$true)]
         [string] $Name,
+
         [string] $IconPath
     )
 
@@ -19,5 +23,8 @@ function New-WcmRegistryGroupItem
     New-Item -Path "$ItemPath\Shell" > $null
     Write-Verbose "New item: $ItemPath\Shell"
 
-    Add-IconProperty -ItemPath $ItemPath -IconPath $IconPath
+    if ($IconPath)
+    {
+        Add-IconProperty -ItemPath $ItemPath -IconPath $IconPath
+    }
 }

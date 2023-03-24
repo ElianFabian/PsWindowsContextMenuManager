@@ -2,9 +2,14 @@ function New-WcmRegistryCommandItem
 {
     param
     (
+        [Parameter(Mandatory=$true)]
         [string] $ItemPath,
+
+        [Parameter(Mandatory=$true)]
         [string] $Name,
+
         [string] $IconPath,
+
         [string] $Command
     )
 
@@ -22,5 +27,8 @@ function New-WcmRegistryCommandItem
     New-ItemProperty -LiteralPath $commandPath -Name '(default)' -Value $Command > $null
     Write-Verbose "New item property: $commandPath\(default) = ""$Command"""
 
-    Add-IconProperty -ItemPath $ItemPath -IconPath $IconPath
+    if ($IconPath)
+    {
+        Add-IconProperty -ItemPath $ItemPath -IconPath $IconPath
+    }
 }

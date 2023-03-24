@@ -1,13 +1,19 @@
-function Add-RootPropertiesIfPossible(
-    [string] $ItemPath,
-    [switch] $Extended,
+function Add-RootPropertiesIfPossible
+{
+    param
+    (
+        [Parameter(Mandatory=$true)]
+        [string] $ItemPath,
 
-    [ValidateSet('Top', 'Bottom', '')]
-    [string] $Position
-) {
+        [switch] $Extended,
+
+        [ValidateSet('Top', 'Bottom', '')]
+        [string] $Position = ''
+    )
+
     if ($Extended)
     {
-        # Mark as extended (must hold Shift to make the option visible)
+        # Mark as extended (must hold Shift to make the item visible in the context menu)
         New-ItemProperty -LiteralPath $ItemPath -Name Extended > $null
 
         Write-Verbose "New item property: $ItemPath\Extended"
