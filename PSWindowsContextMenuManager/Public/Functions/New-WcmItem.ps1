@@ -101,26 +101,25 @@ function New-WcmItem
 
             foreach ($subitem in $ChildItem)
             {
+                $subitemParams =
+                @{
+                    Key           = $subitem.Key
+                    Name          = $subitem.Name
+                    IconPath      = $subitem.IconPath
+                    Type          = $Type
+                    ParentKeyPath = $subitemParentKeyPath
+                }
+
                 if ($subitem.Command)
                 {
-                    New-WcmItem `
-                        -Key $subitem.Key `
-                        -Name $subitem.Name `
-                        -IconPath $subitem.IconPath `
-                        -Type $Type `
-                        -Command $subitem.Command `
-                        -ParentKeyPath $subitemParentKeyPath > $null
+                    $subitemParams.Command = $subitem.Command
                 }
                 else
                 {
-                    New-WcmItem `
-                        -Key $subitem.Key `
-                        -Name $subitem.Name `
-                        -IconPath $subitem.IconPath `
-                        -Type $Type `
-                        -ChildItem $subitem.Children `
-                        -ParentKeyPath $subitemParentKeyPath > $null
+                    $subitemParams.ChildItem = $subitem.Children
                 }
+
+                New-WcmItem @subitemParams > $null
             }
 
             return New-WcmItemObject `
