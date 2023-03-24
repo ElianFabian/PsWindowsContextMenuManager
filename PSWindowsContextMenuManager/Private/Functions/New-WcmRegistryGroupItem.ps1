@@ -18,4 +18,6 @@ function New-WcmRegistryGroupItem
     # Create shell (container of subitems)
     New-Item -Path "$ItemPath\Shell" > $null
     Write-Verbose "New item: $ItemPath\Shell"
+
+    Add-IconProperty -ItemPath $ItemPath -IconPath $IconPath
 }

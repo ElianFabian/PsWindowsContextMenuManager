@@ -22,18 +22,5 @@ function New-WcmRegistryCommandItem
     New-ItemProperty -LiteralPath $commandPath -Name '(default)' -Value $Command > $null
     Write-Verbose "New item property: $commandPath\(default) = ""$Command"""
 
-    if ($IconPath)
-    {
-        $actualIconPath = $IconPath
-
-        if (-not (Test-Path $actualIconPath))
-        {
-            Write-Warning "The icon '$actualIconPath' added to '$ItemPath' does not exist."
-        }
-        else { $actualIconPath = Resolve-Path $IconPath }
-
-        # Set item image
-        New-ItemProperty -LiteralPath $ItemPath -Name Icon -Value $actualIconPath > $null
-        Write-Verbose "New item property: $ItemPath\Icon = ""$actualIconPath"""
-    }
+    Add-IconProperty -ItemPath $ItemPath -IconPath $IconPath
 }
