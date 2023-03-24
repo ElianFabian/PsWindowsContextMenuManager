@@ -19,7 +19,7 @@ function New-WcmRegistryCommandItem
     Write-Verbose "New item property: $ItemPath\$($RegistryProperties.Default) = ""$Name"""
 
     # Set command value
-    New-ItemProperty -LiteralPath $commandPath -Name  $RegistryProperties.Default -Value $Command > $null
+    New-ItemProperty -LiteralPath $commandPath -Name $RegistryProperties.Default -Value $Command > $null
     Write-Verbose "New item property: $commandPath\$($RegistryProperties.Default) = ""$Command"""
 
     if ($IconPath)

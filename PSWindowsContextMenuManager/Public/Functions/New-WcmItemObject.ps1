@@ -1,5 +1,6 @@
 function New-WcmItemObject
 {
+    [OutputType([PSCustomObject])]
     param
     (
         [Parameter(Mandatory=$true)]
@@ -23,40 +24,24 @@ function New-WcmItemObject
         [string] $Command,
 
         [Parameter(ParameterSetName='Group')]
-        [WcmItem[]] $ChildItem
+        [PSCustomObject[]] $ChildItem
     )
+
+    $newItem = [PSCustomObject]@{
+        Key      = $Key
+        Name     = $Name
+        Extended = $Extended ? $true : $false
+    }
 
     switch ($PSCmdlet.ParameterSetName)
     {
-        Command
-        {
-            $newItem = [WcmCommandItem]::new()
-
-            $newItem.Key      = $Key
-            $newItem.Name     = $Name
-            $newItem.IconPath = $IconPath
-            $newItem.Type     = $Type
-            $newItem.Command  = $Command
-
-            $newItem.Position = $Position
-            $newItem.Extended = $Extended ? $true : $false
-
-            return $newItem
-        }
-        Group
-        {
-            $newItem = [WcmGroupItem]::new()
-
-            $newItem.Key      = $Key
-            $newItem.Name     = $Name
-            $newItem.IconPath = $IconPath
-            $newItem.Type     = $Type
-            $newItem.Children = $ChildItem
-
-            $newItem.Position = $Position
-            $newItem.Extended = $Extended ? $true : $false
-
-            return $newItem
-        }
+        Command { $newItem | Add-Member -Name Command  -Value $Command   -MemberType NoteProperty }
+        Group   { $newItem | Add-Member -Name Children -Value $ChildItem -MemberType NoteProperty }
     }
+    if ($Type)     { $newItem | Add-Member -Name Type     -Value $Type     -MemberType NoteProperty }
+    if ($IconPath) { $newItem | Add-Member -Name IconPath -Value $IconPath -MemberType NoteProperty }
+    if ($Position) { $newItem | Add-Member -Name Position -Value $Position -MemberType NoteProperty }
+    if ($Extended) { $newItem | Add-Member -Name Extended -Value $Extended -MemberType NoteProperty }
+
+    return $newItem
 }
