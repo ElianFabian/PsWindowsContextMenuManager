@@ -37,7 +37,7 @@ function New-WcmItem
         [object[]] $ChildItem
     )
 
-    $actualParentPath = Resolve-KeyPath -KeyPath $ParentKeyPath -Type $Type -ChildName $RegistryKeys.Shell
+    $actualParentPath = Resolve-KeyPath -KeyPath $ParentKeyPath -Type $Type -ChildName Shell
 
     if (-not (Test-Path -LiteralPath $actualParentPath))
     {
@@ -92,7 +92,7 @@ function New-WcmItem
             {
                 $duplicateKeys = $($diff | ForEach-Object { $_.InputObject } | Select-Object -Unique | Join-String -Separator ', ')
 
-                Write-Error "The are duplicate keys in '$itemPath\$($RegistryKeys.Shell)': [$duplicateKeys]"
+                Write-Error "The are duplicate keys in '$itemPath\Shell': [$duplicateKeys]"
                 return
             }
 

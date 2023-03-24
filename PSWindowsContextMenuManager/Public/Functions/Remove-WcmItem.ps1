@@ -21,7 +21,7 @@ function Remove-WcmItem
         return
     }
 
-    $isCommand = -not (Get-ItemProperty -LiteralPath $actualPath -Name $RegistryProperties.Subcommands -ErrorAction Ignore)
+    $isCommand = -not (Get-ItemProperty -LiteralPath $actualPath -Name Subcommands -ErrorAction Ignore)
     if ($isCommand)
     {
         Remove-CommandItem -ItemPath $actualPath

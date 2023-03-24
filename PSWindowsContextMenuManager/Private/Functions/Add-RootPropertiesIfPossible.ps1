@@ -8,15 +8,15 @@ function Add-RootPropertiesIfPossible(
     if ($Extended)
     {
         # Mark as extended (must hold Shift to make the option visible)
-        New-ItemProperty -LiteralPath $ItemPath -Name $RegistryProperties.Extended > $null
+        New-ItemProperty -LiteralPath $ItemPath -Name Extended > $null
 
-        Write-Verbose "New item property: $ItemPath\$($RegistryProperties.Extended)"
+        Write-Verbose "New item property: $ItemPath\Extended"
     }
     if ($Position)
     {
         # Set the position (Top | Bottom)
-        New-ItemProperty -LiteralPath $ItemPath -Name $RegistryProperties.Position -Value $Position > $null
+        New-ItemProperty -LiteralPath $ItemPath -Name Position -Value $Position > $null
 
-        Write-Verbose "New item property: $ItemPath\$($RegistryProperties.Position) = ""$Position"""
+        Write-Verbose "New item property: $ItemPath\Position = ""$Position"""
     }
 }
