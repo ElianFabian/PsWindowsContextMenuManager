@@ -7,7 +7,7 @@ function New-WcmItem
 
         [Parameter(Mandatory=$true)]
         [string] $Name,
-        
+
         [ValidatePattern('(.ico|^$)$', ErrorMessage = "The given IconPath '{0}' must be a .ico file.")]
         [string] $IconPath = '',
 
