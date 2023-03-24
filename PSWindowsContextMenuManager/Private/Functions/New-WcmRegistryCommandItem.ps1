@@ -12,15 +12,15 @@ function New-WcmRegistryCommandItem
 
     # Create command
     New-Item $commandPath > $null
-    Write-Verbose "New item: $commandPath" -Verbose:$VerbosePreference
+    Write-Verbose "New item: $commandPath"
 
     # Set command name
     New-ItemProperty -LiteralPath $ItemPath -Name $RegistryProperties.Default -Value $Name > $null
-    Write-Verbose "New item property: $ItemPath\$($RegistryProperties.Default) = ""$Name""" -Verbose:$VerbosePreference
+    Write-Verbose "New item property: $ItemPath\$($RegistryProperties.Default) = ""$Name"""
 
     # Set command value
     New-ItemProperty -LiteralPath $commandPath -Name  $RegistryProperties.Default -Value $Command > $null
-    Write-Verbose "New item property: $commandPath\$($RegistryProperties.Default) = ""$Command""" -Verbose:$VerbosePreference
+    Write-Verbose "New item property: $commandPath\$($RegistryProperties.Default) = ""$Command"""
 
     if ($IconPath)
     {
@@ -34,6 +34,6 @@ function New-WcmRegistryCommandItem
 
         # Set item image
         New-ItemProperty -LiteralPath $ItemPath -Name $RegistryProperties.Icon -Value $actualIconPath > $null
-        Write-Verbose "New item property: $ItemPath\$($RegistryProperties.Icon) = ""$actualIconPath""" -Verbose:$VerbosePreference
+        Write-Verbose "New item property: $ItemPath\$($RegistryProperties.Icon) = ""$actualIconPath"""
     }
 }

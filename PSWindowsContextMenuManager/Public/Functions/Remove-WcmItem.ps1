@@ -24,10 +24,10 @@ function Remove-WcmItem
     $isCommand = -not (Get-ItemProperty -LiteralPath $actualPath -Name $RegistryProperties.Subcommands -ErrorAction Ignore)
     if ($isCommand)
     {
-        Remove-CommandItem -ItemPath $actualPath -Verbose:$VerbosePreference
+        Remove-CommandItem -ItemPath $actualPath
     }
     else
     {
-        Remove-GroupItem -ItemPath $actualPath -Verbose:$VerbosePreference -Recurse:$Recurse
+        Remove-GroupItem -ItemPath $actualPath -Recurse:$Recurse
     }
 }

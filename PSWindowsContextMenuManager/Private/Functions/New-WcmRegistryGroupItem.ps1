@@ -9,13 +9,13 @@ function New-WcmRegistryGroupItem
 
     # Set group name (MUIVerb)
     New-ItemProperty -LiteralPath $ItemPath -Name $RegistryProperties.MUIVerb -Value $Name > $null
-    Write-Verbose "New item property: $ItemPath\$($RegistryProperties.MUIVerb) = ""$Name""" -Verbose:$VerbosePreference
+    Write-Verbose "New item property: $ItemPath\$($RegistryProperties.MUIVerb) = ""$Name"""
 
     # Allow subitems
     New-ItemProperty -LiteralPath $ItemPath -Name $RegistryProperties.Subcommands > $null
-    Write-Verbose "New item property: $ItemPath\$($RegistryProperties.Subcommands)" -Verbose:$VerbosePreference
+    Write-Verbose "New item property: $ItemPath\$($RegistryProperties.Subcommands)"
 
     # Create shell (container of subitems)
     New-Item -Path "$ItemPath\$($RegistryKeys.Shell)" > $null
-    Write-Verbose "New item: $ItemPath\$($RegistryKeys.Shell)" -Verbose:$VerbosePreference
+    Write-Verbose "New item: $ItemPath\$($RegistryKeys.Shell)"
 }

@@ -49,7 +49,7 @@ function New-WcmItem
 
     # Create item
     New-Item $itemPath -ErrorAction SilentlyContinue -ErrorVariable outErrorMessage > $null
-    Write-Verbose "New item: $itemPath" -Verbose:$VerbosePreference
+    Write-Verbose "New item: $itemPath"
 
     switch ($outErrorMessage)
     {
