@@ -8,9 +8,6 @@ function Remove-GroupItem
         [switch] $Recurse
     )
 
-    Remove-Item -LiteralPath "$ItemPath\Shell" -Recurse:$Recurse
-    Remove-Item -LiteralPath $ItemPath
-
-    Write-Verbose "Remove item: '$ItemPath\Shell'"
+    Remove-Item -LiteralPath $ItemPath -Recurse:$Recurse
     Write-Verbose "Remove item: '$ItemPath'"
 }

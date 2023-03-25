@@ -6,9 +6,6 @@ function Remove-CommandItem
         [string] $ItemPath
     )
 
-    Remove-Item -LiteralPath "$ItemPath\Command"
-    Remove-Item -LiteralPath $ItemPath
-
-    Write-Verbose "Remove item: '$ItemPath\Command'"
+    Remove-Item -LiteralPath $ItemPath -Recurse
     Write-Verbose "Remove item: '$ItemPath'"
 }
