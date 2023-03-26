@@ -21,13 +21,6 @@ function Remove-WcmItem
         return
     }
 
-    $isCommand = -not (Get-ItemProperty -LiteralPath $actualPath -Name Subcommands -ErrorAction Ignore)
-    if ($isCommand)
-    {
-        Remove-CommandItem -ItemPath $actualPath
-    }
-    else
-    {
-        Remove-GroupItem -ItemPath $actualPath -Recurse:$Recurse
-    }
+    Remove-Item -LiteralPath $actualPath -Recurse:$Recurse
+    Write-Verbose "Remove item: '$actualPath'"
 }
