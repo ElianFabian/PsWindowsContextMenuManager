@@ -20,14 +20,13 @@ function Resolve-KeyPath
     if ($trimmedKeyPath)
     {
         $path = ($trimmedKeyPath -replace '/', '\\' -split '\\'| ForEach-Object { "$_\Shell\" } | Join-String)
-
-        $path = $path.Remove($path.Length - 2 - 'Shell'.Length)
+        $pathWithoutPendingShell = $path.Remove($path.Length - 2 - 'Shell'.Length)
 
         if ($ChildName)
         {
-             return "$typePath\$path\$ChildName"
+             return "$typePath\$pathWithoutPendingShell\$ChildName"
         }
-        else { return "$typePath\$path" }
+        else { return "$typePath\$pathWithoutPendingShell" }
     }
     else { return $typePath }
 }

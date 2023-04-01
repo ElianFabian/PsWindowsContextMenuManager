@@ -9,6 +9,12 @@ function New-WcmItemObject
         [Parameter(Mandatory=$true)]
         [string] $Name,
 
+        [Parameter(Mandatory=$true)]
+        [string] $RegistryPath,
+
+        [ValidateSet('Command', 'Group')]
+        [string] $ItemType = 'Command',
+
         [ValidatePattern('(.ico|^$)$', ErrorMessage = "The given IconPath '{0}' must be a .ico file.")]
         [string] $IconPath = '',
 
@@ -20,28 +26,28 @@ function New-WcmItemObject
         [ValidateSet('Top', 'Bottom', '')]
         [string] $Position = '',
 
-        [Parameter(ParameterSetName='Command')]
         [string] $Command,
 
-        [Parameter(ParameterSetName='Group')]
-        [PSCustomObject[]] $ChildItem
+        [bool] $IsRootItem
     )
 
     $newItem = [PSCustomObject]@{
-        Key      = $Key
-        Name     = $Name
-        Extended = $Extended ? $true : $false
+        Key          = $Key
+        Name         = $Name
+        RegistryPath = $RegistryPath
     }
 
-    switch ($PSCmdlet.ParameterSetName)
+    if ($IsRootItem)
     {
-        Command { $newItem | Add-Member -Name Command  -Value $Command   -MemberType NoteProperty }
-        Group   { $newItem | Add-Member -Name Children -Value $ChildItem -MemberType NoteProperty }
+        if ($Position) { $newItem | Add-Member -Name Position -Value $Position -MemberType NoteProperty }
+        if ($Extended) { $newItem | Add-Member -Name Extended -Value $Extended -MemberType NoteProperty }
+    }
+    if ($ItemType -eq 'Command')
+    {
+        $newItem | Add-Member -Name Command -Value $Command -MemberType NoteProperty
     }
     if ($Type)     { $newItem | Add-Member -Name Type     -Value $Type     -MemberType NoteProperty }
     if ($IconPath) { $newItem | Add-Member -Name IconPath -Value $IconPath -MemberType NoteProperty }
-    if ($Position) { $newItem | Add-Member -Name Position -Value $Position -MemberType NoteProperty }
-    if ($Extended) { $newItem | Add-Member -Name Extended -Value $Extended -MemberType NoteProperty }
 
     return $newItem
 }

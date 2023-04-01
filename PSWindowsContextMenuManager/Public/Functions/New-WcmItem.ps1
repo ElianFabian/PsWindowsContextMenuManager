@@ -8,6 +8,9 @@ function New-WcmItem
         [Parameter(Mandatory=$true)]
         [string] $Name,
 
+        [ValidateSet('Command', 'Group')]
+        [string] $ItemType = 'Command',
+
         [ValidatePattern('(.ico|^$)$', ErrorMessage = "The given IconPath '{0}' must be a .ico file.")]
         [string] $IconPath = '',
 
@@ -15,26 +18,17 @@ function New-WcmItem
         [ValidateSet('File', 'Directory', 'Desktop', 'Drive')]
         [string] $Type,
 
-        [Parameter(ParameterSetName='Root-Command')]
-        [Parameter(ParameterSetName='Root-Group')]
+        [Parameter(ParameterSetName='Root-Item')]
         [switch] $Extended = $false,
 
-        [Parameter(ParameterSetName='Root-Command')]
-        [Parameter(ParameterSetName='Root-Group')]
+        [Parameter(ParameterSetName='Root-Item')]
         [ValidateSet('Top', 'Bottom', '')]
         [string] $Position = '',
 
-        [Parameter(ParameterSetName='Sub-Command')]
-        [Parameter(ParameterSetName='Sub-Group')]
+        [Parameter(ParameterSetName='Sub-Item')]
         [string] $ParentKeyPath = '',
 
-        [Parameter(ParameterSetName='Root-Command')]
-        [Parameter(ParameterSetName='Sub-Command')]
-        [string] $Command,
-
-        [Parameter(ParameterSetName='Root-Group')]
-        [Parameter(ParameterSetName='Sub-Group')]
-        [object[]] $ChildItem
+        [string] $Command
     )
 
     $actualParentPath = Resolve-KeyPath -KeyPath $ParentKeyPath -Type $Type -ChildName Shell
@@ -60,76 +54,35 @@ function New-WcmItem
         }
     }
 
-    switch -Wildcard ($PSCmdlet.ParameterSetName)
+    $newWcmItemObject = New-WcmItemObject `
+        -Key $Key `
+        -Name $Name `
+        -RegistryPath $itemPath `
+        -ItemType $ItemType `
+        -IconPath $IconPath `
+        -Type $Type `
+        -Extended:$Extended `
+        -Position $Position `
+        -Command $Command `
+        -IsRootItem ($PSCmdlet.ParameterSetName -eq 'Root-Item')
+
+    switch ($ItemType)
     {
-        *-Command
+        Command
         {
             New-WcmRegistryCommandItem -ItemPath $itemPath -Name $Name -IconPath $IconPath -Command $Command
 
             Add-RootPropertiesIfPossible -ItemPath $itemPath -Extended:$Extended -Position $Position
 
-            return New-WcmItemObject `
-                -Key $Key `
-                -Name $Name `
-                -IconPath $IconPath `
-                -Type $Type `
-                -Extended:$Extended `
-                -Position $Position `
-                -Command $Command
+            return $newWcmItemObject
         }
-        *-Group
+        Group
         {
             New-WcmRegistryGroupItem -ItemPath $itemPath -Name $Name -IconPath $IconPath
 
             Add-RootPropertiesIfPossible -ItemPath $itemPath -Extended:$Extended -Position $Position
 
-            $childrenKeys       = $ChildItem | ForEach-Object { $_.Key }
-            $uniqueChildrenKeys = $childrenKeys | Select-Object -Unique
-
-            $diff = Compare-Object -ReferenceObject $childrenKeys -DifferenceObject $uniqueChildrenKeys
-
-            if ($diff)
-            {
-                $duplicateKeys = $($diff | ForEach-Object { $_.InputObject } | Select-Object -Unique | Join-String -Separator ', ')
-
-                Write-Error "The are duplicate keys in '$itemPath\Shell': [$duplicateKeys]"
-                return
-            }
-
-            # Add subitems
-            $subitemParentKeyPath = $ParentKeyPath ? "$ParentKeyPath\$Key" : $Key
-
-            foreach ($subitem in $ChildItem)
-            {
-                $subitemParams =
-                @{
-                    Key           = $subitem.Key
-                    Name          = $subitem.Name
-                    IconPath      = $subitem.IconPath
-                    Type          = $Type
-                    ParentKeyPath = $subitemParentKeyPath
-                }
-
-                if ($subitem.Command)
-                {
-                    $subitemParams.Command = $subitem.Command
-                }
-                else
-                {
-                    $subitemParams.ChildItem = $subitem.Children
-                }
-
-                New-WcmItem @subitemParams > $null
-            }
-
-            return New-WcmItemObject `
-                -Key $Key `
-                -Name $Name `
-                -IconPath $IconPath `
-                -Type $Type `
-                -Extended:$Extended `
-                -Position $Position `
-                -ChildItem $ChildItem
+            return $newWcmItemObject
         }
     }
 }
