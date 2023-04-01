@@ -5,6 +5,7 @@ function Add-IconProperty
         [Parameter(Mandatory=$true)] 
         [string] $ItemPath,
 
+        [ValidatePattern('(.ico|^$)$', ErrorMessage = "The given IconPath '{0}' must be a .ico file.")]
         [string] $IconPath
     )
 
