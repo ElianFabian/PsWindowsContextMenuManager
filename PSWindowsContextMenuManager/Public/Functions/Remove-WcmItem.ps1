@@ -17,7 +17,7 @@ function Remove-WcmItem
     $itemExists = Get-Item -LiteralPath $actualPath -ErrorAction Ignore
     if (-not $itemExists)
     {
-        Write-Warning "Attempt to remove a non-existing item: '$actualPath'."
+        Write-Error "Cannot fin path '$actualPath' because it does not exist."
         return
     }
 
