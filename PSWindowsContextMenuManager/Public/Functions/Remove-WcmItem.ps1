@@ -12,15 +12,15 @@ function Remove-WcmItem
         [switch] $Recurse
     )
     
-    $actualPath = Resolve-KeyPath -KeyPath $KeyPath -Type $Type
+    $registryPath = Resolve-KeyPath -KeyPath $KeyPath -Type $Type
 
-    $itemExists = Get-Item -LiteralPath $actualPath -ErrorAction Ignore
+    $itemExists = Get-Item -LiteralPath $registryPath -ErrorAction Ignore
     if (-not $itemExists)
     {
-        Write-Error "Cannot fin path '$actualPath' because it does not exist."
+        Write-Error "Cannot fin path '$registryPath' because it does not exist."
         return
     }
 
-    Remove-Item -LiteralPath $actualPath -Recurse:$Recurse
-    Write-Verbose "Remove item: '$actualPath'"
+    Remove-Item -LiteralPath $registryPath -Recurse:$Recurse
+    Write-Verbose "Remove item: '$registryPath'"
 }
