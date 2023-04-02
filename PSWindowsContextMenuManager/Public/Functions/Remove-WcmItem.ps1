@@ -3,7 +3,7 @@ function Remove-WcmItem
     param
     (
         [Parameter(Mandatory=$true)]
-        [string] $KeyPath,
+        [string] $LiteralPathKey,
 
         [Parameter(Mandatory=$true)]
         [ValidateSet('File', 'Directory', 'Desktop', 'Drive')]
@@ -12,7 +12,7 @@ function Remove-WcmItem
         [switch] $Recurse
     )
     
-    $registryPath = Resolve-KeyPath -KeyPath $KeyPath -Type $Type
+    $registryPath = Resolve-KeyPath -LiteralPathKey $LiteralPathKey -Type $Type
 
     $itemExists = Get-Item -LiteralPath $registryPath -ErrorAction Ignore
     if (-not $itemExists)

@@ -4,7 +4,7 @@ function Get-WcmItem
     param
     (
         [Parameter(Mandatory=$true)]
-        [string] $KeyPath,
+        [string] $LiteralPathKey,
 
         [Parameter(Mandatory=$true)]
         [ValidateSet('File', 'Directory', 'Desktop', 'Drive')]
@@ -15,10 +15,10 @@ function Get-WcmItem
 
     if ($Copy)
     {
-        return Get-WcmItemCopy -KeyPath $KeyPath -Type $Type
+        return Get-WcmItemCopy -LiteralPathKey $LiteralPathKey -Type $Type
     }
     else
     {
-        return Get-WcmItemReference -KeyPath $KeyPath -Type $Type
+        return Get-WcmItemReference -LiteralPathKey $LiteralPathKey -Type $Type
     }
 }

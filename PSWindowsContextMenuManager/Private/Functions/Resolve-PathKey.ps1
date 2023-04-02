@@ -1,10 +1,10 @@
-function Resolve-KeyPath
+function Resolve-PathKey
 {
     param
     (
         [Parameter(Mandatory=$true)]
         [AllowEmptyString()]
-        [string] $KeyPath,
+        [string] $LiteralPathKey,
 
         [Parameter(Mandatory=$true)]
         [ValidateSet('File', 'Directory', 'Desktop', 'Drive')]
@@ -15,11 +15,11 @@ function Resolve-KeyPath
 
     $typePath = $ContextMenuPathType.$Type
 
-    $trimmedKeyPath = $KeyPath.Trim('\').Trim('/')
+    $trimmedLiteralPathKey = $LiteralPathKey.Trim('\').Trim('/')
 
-    if ($trimmedKeyPath)
+    if ($trimmedLiteralPathKey)
     {
-        $path = ($trimmedKeyPath -replace '/', '\\' -split '\\'| ForEach-Object { "$_\Shell\" } | Join-String)
+        $path = ($trimmedLiteralPathKey -replace '/', '\\' -split '\\'| ForEach-Object { "$_\Shell\" } | Join-String)
         $pathWithoutPendingShell = $path.Remove($path.Length - 2 - 'Shell'.Length)
 
         if ($ChildName)

@@ -27,12 +27,12 @@ function New-WcmItem
         [string] $Position = '',
 
         [Parameter(ParameterSetName='Sub-Item')]
-        [string] $ParentKeyPath = '',
+        [string] $ParentLiteralPathKey = '',
 
         [string] $Command
     )
 
-    $registryParentPath = Resolve-KeyPath -KeyPath $ParentKeyPath -Type $Type -ChildName Shell
+    $registryParentPath = Resolve-PathKey -LiteralPathKey $ParentLiteralPathKey -Type $Type -ChildName Shell
 
     if (-not (Test-Path -LiteralPath $registryParentPath))
     {
@@ -60,16 +60,14 @@ function New-WcmItem
         Command
         {
             New-WcmRegistryCommandItem -ItemPath $itemPath -Name $Name -IconPath $IconPath -Command $Command
-
-            Add-RootPropertiesIfPossible -ItemPath $itemPath -Extended:$Extended -Position $Position
         }
         Group
         {
             New-WcmRegistryGroupItem -ItemPath $itemPath -Name $Name -IconPath $IconPath
-
-            Add-RootPropertiesIfPossible -ItemPath $itemPath -Extended:$Extended -Position $Position
         }
     }
 
-    return Get-WcmItem -KeyPath ($ParentKeyPath ? "$ParentKeyPath\$Key" : $Key) -Type $Type
+    Add-RootPropertiesIfPossible -ItemPath $itemPath -Extended:$Extended -Position $Position
+
+    return Get-WcmItem -LiteralPathKey ($ParentLiteralPathKey ? "$ParentLiteralPathKey\$Key" : $Key) -Type $Type
 }

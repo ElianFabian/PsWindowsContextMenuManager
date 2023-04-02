@@ -4,15 +4,15 @@ function Get-WcmItemCopy
     param
     (
         [Parameter(Mandatory=$true)]
-        [string] $KeyPath,
+        [string] $LiteralPathKey,
 
         [ValidateSet('File', 'Directory', 'Desktop', 'Drive')]
         [string] $Type = 'File'
     )
 
-    $registryPath = Resolve-KeyPath -KeyPath $KeyPath -Type $Type
+    $registryPath = Resolve-PathKey -LiteralPathKey $LiteralPathKey -Type $Type
 
-    [Microsoft.Win32.RegistryKey] $registryItem = Get-Item -LiteralPath $registryPath
+    [Microsoft.Win32.RegistryKey] $registryItem = Get-Item -LiteralPath $registryPath -ErrorAction Stop
 
     $childName = $registryItem.GetSubKeyNames()[0]
 
