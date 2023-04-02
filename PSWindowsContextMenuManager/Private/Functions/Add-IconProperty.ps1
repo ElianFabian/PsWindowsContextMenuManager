@@ -17,7 +17,7 @@ function Add-IconProperty
     }
     else { $actualIconPath = Resolve-Path $IconPath }
 
-    # Set item image
+    # Set item icon
     New-ItemProperty -LiteralPath $ItemPath -Name Icon -Value $actualIconPath > $null
     Write-Verbose "New item property: $ItemPath\Icon = ""$actualIconPath"""
 }
