@@ -33,7 +33,7 @@ function Resolve-KeyPath
 
 
 
-$BasePath = "Registry::HKEY_CLASSES_ROOT"
+$BasePath = "Microsoft.PowerShell.Core\Registry::HKEY_CLASSES_ROOT"
 
 $ContextMenuPathType =
 @{

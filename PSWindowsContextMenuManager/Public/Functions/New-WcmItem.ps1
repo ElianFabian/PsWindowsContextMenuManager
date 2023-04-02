@@ -1,5 +1,6 @@
 function New-WcmItem
 {
+    [CmdletBinding(DefaultParameterSetName='Root-Item')]
     param
     (
         [Parameter(Mandatory=$true)]
@@ -31,15 +32,15 @@ function New-WcmItem
         [string] $Command
     )
 
-    $actualParentPath = Resolve-KeyPath -KeyPath $ParentKeyPath -Type $Type -ChildName Shell
+    $registryParentPath = Resolve-KeyPath -KeyPath $ParentKeyPath -Type $Type -ChildName Shell
 
-    if (-not (Test-Path -LiteralPath $actualParentPath))
+    if (-not (Test-Path -LiteralPath $registryParentPath))
     {
-        Write-Error "The path '$actualParentPath' does not exist."
+        Write-Error "The path '$registryParentPath' does not exist."
         return
     }
 
-    $itemPath = "$actualParentPath\$Key"
+    $itemPath = "$registryParentPath\$Key"
 
     # Create item
     New-Item $itemPath -ErrorAction SilentlyContinue -ErrorVariable outErrorMessage > $null
@@ -54,18 +55,6 @@ function New-WcmItem
         }
     }
 
-    $newWcmItemObject = New-WcmItemObject `
-        -Key $Key `
-        -Name $Name `
-        -RegistryPath $itemPath `
-        -ItemType $ItemType `
-        -IconPath $IconPath `
-        -Type $Type `
-        -Extended:$Extended `
-        -Position $Position `
-        -Command $Command `
-        -IsRootItem ($PSCmdlet.ParameterSetName -eq 'Root-Item')
-
     switch ($ItemType)
     {
         Command
@@ -73,16 +62,14 @@ function New-WcmItem
             New-WcmRegistryCommandItem -ItemPath $itemPath -Name $Name -IconPath $IconPath -Command $Command
 
             Add-RootPropertiesIfPossible -ItemPath $itemPath -Extended:$Extended -Position $Position
-
-            return $newWcmItemObject
         }
         Group
         {
             New-WcmRegistryGroupItem -ItemPath $itemPath -Name $Name -IconPath $IconPath
 
             Add-RootPropertiesIfPossible -ItemPath $itemPath -Extended:$Extended -Position $Position
-
-            return $newWcmItemObject
         }
     }
+
+    return Get-WcmItem -KeyPath ($ParentKeyPath ? "$ParentKeyPath\$Key" : $Key) -Type $Type
 }
