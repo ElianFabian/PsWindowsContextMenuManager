@@ -42,7 +42,6 @@ function New-WcmItem
 
     $itemPath = "$registryParentPath\$Key"
 
-    # Create item
     New-Item $itemPath -ErrorAction SilentlyContinue -ErrorVariable outErrorMessage > $null
     Write-Verbose "New item: $itemPath"
 
