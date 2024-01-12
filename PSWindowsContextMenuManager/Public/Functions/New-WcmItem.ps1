@@ -12,7 +12,6 @@ function New-WcmItem
         [ValidateSet('Command', 'Group')]
         [string] $ItemType = 'Command',
 
-        [ValidatePattern('(.ico|^$)$', ErrorMessage = "The given IconPath '{0}' must be a .ico file.")]
         [string] $IconPath = '',
 
         [Parameter(Mandatory=$true)]

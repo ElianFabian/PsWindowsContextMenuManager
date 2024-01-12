@@ -5,9 +5,13 @@ function Add-IconProperty
         [Parameter(Mandatory=$true)] 
         [string] $ItemPath,
 
-        [ValidatePattern('(.ico|^$)$', ErrorMessage = "The given IconPath '{0}' must be a .ico file.")]
         [string] $IconPath
     )
+
+    if ($IconPath -and -not $IconPath.EndsWith('.ico'))
+    {
+        Write-Warning "The given IconPath '$IconPath' it's not a .ico file. It won't be visible in the context menu."
+    }
 
     $actualIconPath = $IconPath
 
