@@ -12,12 +12,12 @@ function Remove-WcmItem
         [switch] $Recurse
     )
     
-    $registryPath = Resolve-KeyPath -LiteralPathKey $LiteralPathKey -Type $Type
+    $registryPath = Resolve-PathKey -LiteralPathKey $LiteralPathKey -Type $Type
 
     $itemExists = Get-Item -LiteralPath $registryPath -ErrorAction Ignore
     if (-not $itemExists)
     {
-        Write-Error "Cannot fin path '$registryPath' because it does not exist."
+        Write-Error "Cannot find context menu item with key '$LiteralPathKey' and type '$Type' because it does not exist. Full path: '$registryPath'."
         return
     }
 
