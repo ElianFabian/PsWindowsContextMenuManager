@@ -17,18 +17,24 @@ function Resolve-PathKey
 
     $trimmedLiteralPathKey = $LiteralPathKey.Trim('\').Trim('/')
 
-    if ($trimmedLiteralPathKey)
+    $registryPath = if ($trimmedLiteralPathKey)
     {
         $path = ($trimmedLiteralPathKey -replace '/', '\\' -split '\\'| ForEach-Object { "$_\Shell\" } | Join-String)
         $pathWithoutPendingShell = $path.Remove($path.Length - 2 - 'Shell'.Length)
 
         if ($ChildName)
         {
-             return "$typePath\$pathWithoutPendingShell\$ChildName"
+             "$typePath\$pathWithoutPendingShell\$ChildName"
         }
-        else { return "$typePath\$pathWithoutPendingShell" }
+        else { "$typePath\$pathWithoutPendingShell" }
     }
-    else { return $typePath }
+    else { $typePath }
+
+    if (-not (Test-Path -LiteralPath $registryPath))
+    {
+        Write-Error "The context menu item with key '$LiteralPathKey' and type '$Type' does not exist. Full path: '$registryPath'."
+        return
+    }
 }
 
 
