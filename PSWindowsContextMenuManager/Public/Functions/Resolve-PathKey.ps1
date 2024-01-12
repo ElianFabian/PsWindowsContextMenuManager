@@ -33,8 +33,10 @@ function Resolve-PathKey
     if (-not (Test-Path -LiteralPath $registryPath))
     {
         Write-Error "The context menu item with key '$LiteralPathKey' and type '$Type' does not exist. Full path: '$registryPath'."
-        return
+        return $null
     }
+
+    return $registryPath
 }
 
 
