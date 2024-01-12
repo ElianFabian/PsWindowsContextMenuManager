@@ -19,7 +19,7 @@ function Resolve-PathKey
 
     $registryPath = if ($trimmedLiteralPathKey)
     {
-        $path = ($trimmedLiteralPathKey -replace '/', '\\' -split '\\'| ForEach-Object { "$_\Shell\" } | Join-String)
+        $path = ($trimmedLiteralPathKey -replace '/', '\' -split '\\'| ForEach-Object { "$_\Shell\" } | Join-String)
         $pathWithoutPendingShell = $path.Remove($path.Length - 2 - 'Shell'.Length)
 
         if ($ChildName)
