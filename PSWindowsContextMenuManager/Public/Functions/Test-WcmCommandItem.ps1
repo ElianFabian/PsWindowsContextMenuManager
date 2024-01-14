@@ -21,10 +21,7 @@ function Test-WcmCommandItem
     [Microsoft.Win32.RegistryKey]`
     $registryItem = Get-Item -LiteralPath $registryPath -ErrorAction Ignore
 
-    $childName = $registryItem.GetSubKeyNames()[0]
-
-    $isGroupItem = ('Subcommands' -in $registryItem.Property) -and ($childName -eq 'Shell')
-    $isCommandItem = ($childName -eq 'Command') -and (-not $isGroupItem)
+    $isCommandItem = ('Command' -in $registryItem.GetSubKeyNames())
 
     return $isCommandItem
 }
