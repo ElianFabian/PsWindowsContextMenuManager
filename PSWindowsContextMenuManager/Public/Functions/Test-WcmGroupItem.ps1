@@ -11,7 +11,12 @@ function Test-WcmGroupItem
         [string] $Type
     )
 
-    $registryPath = Resolve-PathKey -LiteralPathKey $LiteralPathKey -Type $Type
+    $registryPath = Resolve-PathKey -LiteralPathKey $LiteralPathKey -Type $Type -ErrorAction Ignore
+
+    if (-not $registryPath)
+    {
+        return $false
+    }
 
     [Microsoft.Win32.RegistryKey]`
     $registryItem = Get-Item -LiteralPath $registryPath -ErrorAction Ignore
