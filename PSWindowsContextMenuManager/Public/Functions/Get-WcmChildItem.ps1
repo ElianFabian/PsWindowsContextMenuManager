@@ -18,13 +18,7 @@ function Get-WcmChildItem
         return Get-WcmItem -LiteralPathKey $LiteralPathKey -Type $Type
     }
 
-    $registryPath = Resolve-PathKey -LiteralPathKey $LiteralPathKey -Type $Type
-
-    if (-not (Test-WcmGroupItem -LiteralPathKey $LiteralPathKey -Type $Type) -and $LiteralPathKey)
-    {
-        Write-Error "The context menu item with key '$LiteralPathKey' and type '$Type' does not exist or it's not a valid context menu item. Full registry path: '$registryPath'."
-        return $null
-    }
+    $registryPath = Resolve-PathKey -LiteralPathKey $LiteralPathKey -Type $Type -ErrorAction
 
     $registryChildItems = Get-ChildItem -LiteralPath "$registryPath\Shell" -ErrorAction Ignore
 

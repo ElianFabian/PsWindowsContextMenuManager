@@ -40,7 +40,7 @@ function Resolve-PathKey
 
     if (-not ($isGroupItem -or $isCommandItem))
     {
-        Write-Error "The context menu item with key '$LiteralPathKey' and type '$Type' does not exist or it's not a valid context menu item. Full registry path: '$registryPath'."
+        Write-Error "The context menu item with key '$LiteralPathKey' and type '$Type' it's not a valid context menu item. Full registry path: '$registryPath'."
         return $null
     }
 
