@@ -2,19 +2,20 @@ function Resolve-PathKey
 {
     param
     (
-        [Parameter(Mandatory=$true)]
-        [AllowEmptyString()]
-        [string] $LiteralPathKey,
+        [string] $LiteralPathKey = '',
 
         [Parameter(Mandatory=$true)]
         [ValidateSet('File', 'Directory', 'Desktop', 'Drive')]
-        [string] $Type,
+        [string] $Type
+    )
 
-        [string] $ChildName = ''
-    ) 
+    $typeRegistryPath = Get-TypeRegistryPath -Type $Type
 
-    $typePath = $ContextMenuPathType.$Type
-
+    if (-not $LiteralPathKey)
+    {
+        return $typeRegistryPath
+    }
+   
     $trimmedLiteralPathKey = $LiteralPathKey.Trim('\').Trim('/')
 
     $registryPath = if ($trimmedLiteralPathKey)
@@ -24,29 +25,17 @@ function Resolve-PathKey
 
         if ($ChildName)
         {
-             "$typePath\$pathWithoutPendingShell\$ChildName"
+             "$typeRegistryPath\Shell\$pathWithoutPendingShell\$ChildName"
         }
-        else { "$typePath\$pathWithoutPendingShell" }
+        else { "$typeRegistryPath\Shell\$pathWithoutPendingShell" }
     }
-    else { $typePath }
+    else { "$typeRegistryPath\Shell" }
 
     if (-not (Test-Path -LiteralPath $registryPath))
     {
-        Write-Error "The context menu item with key '$LiteralPathKey' and type '$Type' does not exist. Full path: '$registryPath'."
+        Write-Error "The context menu item with key '$LiteralPathKey' and type '$Type' does not exist. Full registry path: '$registryPath'."
         return $null
     }
 
     return $registryPath
-}
-
-
-
-$BasePath = "Microsoft.PowerShell.Core\Registry::HKEY_CLASSES_ROOT"
-
-$ContextMenuPathType =
-@{
-    File      = "$BasePath\*\shell"
-    Directory = "$BasePath\Directory\shell"
-    Desktop   = "$BasePath\Directory\background\shell"
-    Drive     = "$BasePath\Drive\shell"
 }

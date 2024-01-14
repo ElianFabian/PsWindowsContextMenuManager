@@ -8,12 +8,10 @@ function Test-PathKey
 
         [Parameter(Mandatory=$true)]
         [ValidateSet('File', 'Directory', 'Desktop', 'Drive')]
-        [string] $Type,
+        [string] $Type
+    )
 
-        [string] $ChildName = ''
-    ) 
-
-    $registryPath = Resolve-PathKey -LiteralPathKey $LiteralPathKey -Type $Type -ChildName $ChildName -ErrorAction Ignore
+    $registryPath = Resolve-PathKey -LiteralPathKey $LiteralPathKey -Type $Type -ErrorAction Ignore
 
     if (-not $registryPath)
     {

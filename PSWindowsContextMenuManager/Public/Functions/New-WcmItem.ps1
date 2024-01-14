@@ -19,7 +19,7 @@ function New-WcmItem
         [string] $Type,
 
         [Parameter(ParameterSetName='Root-Item')]
-        [switch] $Extended = $false,
+        [switch] $Extended,
 
         [Parameter(ParameterSetName='Root-Item')]
         [ValidateSet('Top', 'Bottom', '')]
@@ -31,11 +31,11 @@ function New-WcmItem
         [string] $Command
     )
 
-    $registryParentPath = Resolve-PathKey -LiteralPathKey $ParentLiteralPathKey -Type $Type -ChildName Shell
+    $registryParentPath = Resolve-PathKey -LiteralPathKey $ParentLiteralPathKey -Type $Type
 
     if (-not (Test-Path -LiteralPath $registryParentPath))
     {
-        Write-Error "The path '$registryParentPath' does not exist."
+        Write-Error "The path key '$ParentLiteralPathKey\$Key' does not exist. Full registry path: '$registryParentPath'."
         return
     }
 
@@ -48,7 +48,7 @@ function New-WcmItem
     {
         'A key in this path already exists.'
         {
-            Write-Error "The path '$itemPath' already exists."
+            Write-Error "The path key '$ParentLiteralPathKey\$Key' already exists. Full registry path: '$itemPath'."
             return
         }
     }
