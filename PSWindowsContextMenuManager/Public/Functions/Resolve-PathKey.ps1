@@ -33,5 +33,16 @@ function Resolve-PathKey
         return $null
     }
 
+    $registryItem = Get-Item -LiteralPath $registryPath
+
+    $isGroupItem = ('Subcommands' -in $registryItem.Property) -and ('Shell' -in $registryItem.GetSubKeyNames())
+    $isCommandItem = ('Command' -in $registryItem.GetSubKeyNames())
+
+    if (-not ($isGroupItem -or $isCommandItem))
+    {
+        Write-Error "The context menu item with key '$LiteralPathKey' and type '$Type' does not exist or it's not a valid context menu item. Full registry path: '$registryPath'."
+        return $null
+    }
+
     return $registryPath
 }
