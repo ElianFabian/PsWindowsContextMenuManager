@@ -18,14 +18,12 @@ function Get-WcmItem
 
     if (-not $registryItem)
     {
-        Write-Error "Cannot find context menu item with key '$LiteralPathKey' and type '$Type' because it does not exist. Full path: '$registryPath'."
+        Write-Error "Cannot find context menu item with key '$LiteralPathKey' and type '$Type' because it does not exist or it's not a valid context menu item. Full path: '$registryPath'."
         return
     }
 
-    $childName = $registryItem.GetSubKeyNames()[0]
-
-    $isGroupItem = ('Subcommands' -in $registryItem.Property) -and ($childName -eq 'Shell')
-    $isCommandItem = ($childName -eq 'Command') -and (-not $isGroupItem)
+    $isGroupItem = Test-WcmGroupItem -LiteralPathKey $LiteralPathKey -Type $Type
+    $isCommandItem = Test-WcmCommandItem -LiteralPathKey $LiteralPathKey -Type $Type
 
     $itemType = if ($isGroupItem)
     {
