@@ -1,4 +1,4 @@
-function Add-RootPropertiesIfPossible
+function Set-RootProperties
 {
     param
     (

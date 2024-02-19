@@ -65,7 +65,7 @@ function New-WcmItem
         }
     }
 
-    Add-RootPropertiesIfPossible -ItemPath $itemPath -Extended:$Extended -Position $Position
+    Set-RootProperties -ItemPath $itemPath -Extended:$Extended -Position $Position
 
     return Get-WcmItem -LiteralPathKey ($ParentLiteralPathKey ? "$ParentLiteralPathKey\$Key" : $Key) -Type $Type
 }
