@@ -1,11 +1,10 @@
-function New-WcmRegistryCommandItem
-{
-    param
-    (
-        [Parameter(Mandatory=$true)]
+function New-WindowsContextMenuRegistryCommandItem {
+
+    param (
+        [Parameter(Mandatory)]
         [string] $ItemPath,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [string] $Name,
 
         [string] $IconPath,
@@ -27,8 +26,6 @@ function New-WcmRegistryCommandItem
     New-ItemProperty -LiteralPath $commandPath -Name '(default)' -Value $Command > $null
     Write-Verbose "New item property: $commandPath\(default) = ""$Command"""
 
-    if ($IconPath)
-    {
-        Add-IconProperty -ItemPath $ItemPath -IconPath $IconPath
-    }
+   
+    Set-WindowsContextMenuIconProperty -ItemPath $ItemPath -IconPath $IconPath
 }
